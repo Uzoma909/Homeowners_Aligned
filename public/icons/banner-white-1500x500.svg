@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="500" viewBox="0 0 1500 500">
+  <rect width="1500" height="500" fill="#ffffff"/>
+  <g transform="translate(680,20) scale(1)">
+    <polygon points="70,6 8,140 24,140 70,42" fill="#7c3aed"/>
+    <polygon points="70,6 132,140 116,140 70,42" fill="#7c3aed"/>
+    <rect x="42" y="82" width="56" height="58" rx="3" fill="#ffffff" stroke="#7c3aed" stroke-width="5"/>
+    <rect x="46" y="86" width="24" height="50" rx="2" fill="#7c3aed"/>
+    <rect x="70" y="86" width="4" height="50" fill="#ffffff"/>
+    <rect x="74" y="86" width="20" height="50" rx="2" fill="#7c3aed" opacity="0.28"/>
+    <circle cx="66" cy="112" r="3.5" fill="#ffffff"/>
+  </g>
+  <text x="750" y="250" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="64" fill="#0f172a" letter-spacing="16">HOMEOWNERS</text>
+  <text x="750" y="330" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="300" font-size="60" fill="#7c3aed" letter-spacing="24">ALIGNED</text>
+  <text x="750" y="400" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="500" font-size="24" fill="#94a3b8" letter-spacing="10">HONEST · OPEN · ACCOUNTABLE</text>
+</svg>
