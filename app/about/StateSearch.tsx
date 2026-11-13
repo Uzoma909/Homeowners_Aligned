@@ -76,7 +76,7 @@ export function StateSearch() {
               {selectedState.name}
               {selectedState.live && (
                 <span style={{ color: "var(--color-ha-primary)", fontWeight: 600 }}>
-                  {" \u00b7 Live"}
+                  {" \u00b7 In dataset"}
                 </span>
               )}
             </>
@@ -188,7 +188,7 @@ export function StateSearch() {
                         color: selected === s.code ? "white" : "var(--color-ha-primary)",
                       }}
                     >
-                      {"\u00b7 Live"}
+                      {"\u00b7 In dataset"}
                     </span>
                   )}
                 </button>

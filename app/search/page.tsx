@@ -1,6 +1,8 @@
 import { NavBar, Footer } from "@/components/layout";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
+import { HOA_CARD_COLUMNS, sanitizeSearchTerm } from "@/lib/hoa";
 import { SearchResults } from "./SearchResults";
+import type { HOA } from "@/types";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -10,10 +12,12 @@ interface PageProps {
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const { q } = await searchParams;
   return {
-    title: q ? `"${q}" | Homeowners Aligned` : "Search HOAs | Homeowners Aligned",
+    title: q ? `"${q}" in HOA Records` : "Browse HOA Records",
     description: q
-      ? `Search results for "${q}" across 3,400+ DFW HOA profiles.`
-      : "Search HOA profiles across Dallas-Fort Worth. Free Health Scores, board members, fees, and public records.",
+      ? `Search results for "${q}" across Dallas-Fort Worth HOA profiles built from public records.`
+      : "Browse Dallas-Fort Worth HOA profiles built from public records: projected transparency scores, board members, fees, and filings.",
+    // Result pages are an unbounded set of query URLs, so they stay out of search indexes.
+    robots: { index: false, follow: true },
   };
 }
 
@@ -21,19 +25,22 @@ const PER_PAGE = 24;
 
 export default async function SearchPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const q = params.q?.trim() || "";
-  const cityFilter = params.city?.trim() || "";
-  const countyFilter = params.county?.trim() || "";
-  const page = Math.max(1, parseInt(params.page || "1", 10));
+  const rawQuery = params.q?.trim() || "";
+  const q = sanitizeSearchTerm(rawQuery);
+  const cityFilter = sanitizeSearchTerm(params.city || "");
+  const countyFilter = sanitizeSearchTerm(params.county || "");
+  const parsedPage = parseInt(params.page || "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.min(parsedPage, 1000) : 1;
   const offset = (page - 1) * PER_PAGE;
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Build query
   let query = supabase
     .from("hoas")
-    .select("id, legal_name, display_name, city, county, zip, entity_status, mgmt_company_name, data_completeness_percent, health_score, subdivision_name, association_website, registered_agent_name, sos_effective_date, recording_instrument_number, certificate_url, mgmt_company_phone, mgmt_company_email", { count: "exact" })
+    .select(HOA_CARD_COLUMNS, { count: "exact" })
     .order("data_completeness_percent", { ascending: false, nullsFirst: false })
+    .order("legal_name", { ascending: true })
     .range(offset, offset + PER_PAGE - 1);
 
   // Text search across multiple columns
@@ -51,7 +58,11 @@ export default async function SearchPage({ searchParams }: PageProps) {
     query = query.ilike("county", `%${countyFilter}%`);
   }
 
-  const { data: hoas, count } = await query;
+  const { data: hoas, count, error } = await query;
+  if (error) {
+    // Logged server-side only. The page shows a generic "could not be loaded" state.
+    console.error("[search] HOA query failed:", error.message);
+  }
 
   // Get unique cities and counties for filter dropdowns
   const { data: cities } = await supabase
@@ -66,20 +77,24 @@ export default async function SearchPage({ searchParams }: PageProps) {
     .not("county", "is", null)
     .order("county");
 
-  const uniqueCities = [...new Set((cities || []).map((c) => c.city).filter(Boolean))];
-  const uniqueCounties = [...new Set((counties || []).map((c) => c.county).filter(Boolean))];
+  const uniqueCities = [
+    ...new Set(((cities as { city: string }[] | null) || []).map((c) => c.city).filter(Boolean)),
+  ];
+  const uniqueCounties = [
+    ...new Set(((counties as { county: string }[] | null) || []).map((c) => c.county).filter(Boolean)),
+  ];
 
   const totalResults = count || 0;
   const totalPages = Math.ceil(totalResults / PER_PAGE);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <NavBar activePath="/" />
+      <NavBar activePath="/search" />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <SearchResults
-          query={q}
-          hoas={hoas || []}
+          query={rawQuery}
+          hoas={(hoas as unknown as HOA[] | null) || []}
           totalResults={totalResults}
           currentPage={page}
           totalPages={totalPages}
@@ -87,6 +102,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
           counties={uniqueCounties}
           activeCity={cityFilter}
           activeCounty={countyFilter}
+          loadFailed={!!error}
         />
       </main>
 

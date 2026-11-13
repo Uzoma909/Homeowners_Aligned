@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { getScoreColor, getScoreLabel } from "@/types";
 import type { ScoringResult } from "@/lib/scoring";
 
@@ -19,18 +20,27 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
   }, []);
 
   const { projectedScore, pillars, availablePillars, totalPillars, completedCheckpoints, totalCheckpoints } = scoring;
-  const animatedScore = mounted ? projectedScore : 0;
 
   return (
     <div className="ha-card rounded-2xl p-6 md:p-8">
       {/* Projected label */}
       <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <span
             className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
             style={{ background: "var(--color-ha-primary)", color: "white" }}
           >
             Public Projected Score
+          </span>
+          <span
+            className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+            style={{
+              background: "var(--color-ha-surface)",
+              color: "var(--color-ha-deep)",
+              border: "1px solid var(--color-ha-border-strong)",
+            }}
+          >
+            Experimental
           </span>
           <span className="text-[12px]" style={{ color: "var(--color-ha-gray)" }}>
             Based on {availablePillars} of {totalPillars} pillars
@@ -38,11 +48,24 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
         </div>
       </div>
 
+      {projectedScore == null && (
+        <p
+          className="text-[13px] leading-relaxed mb-5 p-3 rounded-xl"
+          style={{
+            background: "var(--color-ha-surface)",
+            color: "var(--color-ha-text-soft)",
+          }}
+        >
+          Not enough public data to score this HOA. A projected score needs at
+          least 5 of the 12 public checkpoints.
+        </p>
+      )}
+
       {/* Main layout: Score left, Bars right */}
       <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 md:gap-10 items-center">
         {/* Animated arc badge */}
         <div className="flex justify-center">
-          <AnimatedArc score={animatedScore} size={170} />
+          <AnimatedArc score={projectedScore} filled={mounted} size={170} />
         </div>
 
         {/* Dimension bars with collapsible details */}
@@ -51,6 +74,8 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
             <div key={pillar.key}>
               <button
                 className="w-full text-left cursor-pointer bg-transparent border-0 p-0 font-[inherit]"
+                aria-expanded={expandedPillar === pillar.key}
+                aria-controls={`pillar-${pillar.key}`}
                 onClick={() =>
                   setExpandedPillar(
                     expandedPillar === pillar.key ? null : pillar.key
@@ -70,6 +95,7 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
               {/* Collapsible checklist */}
               {expandedPillar === pillar.key && (
                 <div
+                  id={`pillar-${pillar.key}`}
                   className="mt-2 ml-1 pl-3 flex flex-col gap-1.5 animate-fade-in"
                   style={{ borderLeft: "2px solid var(--color-ha-border)" }}
                 >
@@ -78,8 +104,10 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
                       key={cp.label}
                       className="flex items-center gap-2 text-[12px] py-0.5"
                     >
+                      <span className="sr-only">{cp.done ? "On file: " : "Missing: "}</span>
                       {cp.done ? (
                         <svg
+                          aria-hidden="true"
                           width={12}
                           height={12}
                           viewBox="0 0 24 24"
@@ -93,6 +121,7 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
                         </svg>
                       ) : (
                         <svg
+                          aria-hidden="true"
                           width={12}
                           height={12}
                           viewBox="0 0 24 24"
@@ -122,7 +151,7 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
                             color: "var(--color-ha-primary)",
                           }}
                         >
-                          Help complete
+                          Not collected
                         </span>
                       )}
                     </div>
@@ -143,16 +172,17 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
           <strong style={{ color: "var(--color-ha-text)", fontFamily: "var(--font-space)" }}>
             {completedCheckpoints}/{totalCheckpoints}
           </strong>
-          {" "}data points verified from{" "}
+          {" "}data points found in{" "}
           <strong style={{ color: "var(--color-ha-text)" }}>2</strong> public sources
-          {" "}&middot; Click any pillar to see details
+          {" "}&middot; Select any pillar to see details
         </span>
-        <button
-          className="text-[12px] font-semibold cursor-pointer bg-transparent border-0 p-0"
-          style={{ color: "var(--color-ha-primary)", fontFamily: "inherit" }}
+        <Link
+          href="/project#scoring"
+          className="text-[12px] font-semibold hover:underline shrink-0"
+          style={{ color: "var(--color-ha-primary)" }}
         >
-          <a href="/about#scoring" style={{ color: "var(--color-ha-primary)", textDecoration: "none", fontWeight: 600 }}>How is this scored? →</a>
-        </button>
+          {"How is this scored? →"}
+        </Link>
       </div>
     </div>
   );
@@ -162,9 +192,12 @@ export function HealthScoreCard({ scoring }: HealthScoreCardProps) {
 
 function AnimatedArc({
   score,
+  filled,
   size = 144,
 }: {
   score: number | null;
+  /** False until mount, so the ring animates from empty. The number and label are always the real score. */
+  filled: boolean;
   size?: number;
 }) {
   const color = getScoreColor(score);
@@ -174,15 +207,24 @@ function AnimatedArc({
   const r = size / 2 - sw / 2 - 2;
   const c = 2 * Math.PI * r;
   const pct = (score ?? 0) / 100;
-  const dash = c * pct;
+  const dash = filled ? c * pct : 0;
 
   return (
     <div
       className="flex flex-col items-center"
       style={{ gap: size > 90 ? 12 : 6 }}
     >
-      <div style={{ position: "relative", width: size, height: size }}>
+      <div
+        role="img"
+        aria-label={
+          score != null
+            ? `Projected score ${score} out of 100, ${label}`
+            : "No projected score"
+        }
+        style={{ position: "relative", width: size, height: size }}
+      >
         <svg
+          aria-hidden="true"
           width={size}
           height={size}
           viewBox={`0 0 ${size} ${size}`}

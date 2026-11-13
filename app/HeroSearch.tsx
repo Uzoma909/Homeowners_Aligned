@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { ScoreBadge } from "@/components/ui";
+import { createPublicClient } from "@/lib/supabase/client";
+import { sanitizeSearchTerm } from "@/lib/hoa";
 import { Search, ArrowRight } from "lucide-react";
 import type { HOA } from "@/types";
 
@@ -22,32 +22,36 @@ export function HeroSearch({
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = createPublicClient();
+
+  const term = sanitizeSearchTerm(query);
+  const canSuggest = term.length >= 2;
+  // Suggestions are only shown while the current input is long enough to search.
+  const suggestions = canSuggest ? results : [];
 
   useEffect(() => {
-    if (!query.trim() || query.length < 2) {
-      setResults([]);
-      return;
-    }
+    if (!canSuggest) return;
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       const { data } = await supabase
         .from("hoas")
-        .select("id, legal_name, display_name, city, county, zip, association_type, health_score, data_completeness_percent")
+        .select("id, legal_name, display_name, city, county, zip, association_type")
         .or(
-          `legal_name.ilike.%${query}%,display_name.ilike.%${query}%,city.ilike.%${query}%,zip.ilike.%${query}%,subdivision_name.ilike.%${query}%`
+          `legal_name.ilike.%${term}%,display_name.ilike.%${term}%,city.ilike.%${term}%,zip.ilike.%${term}%,subdivision_name.ilike.%${term}%`
         )
-        .order("data_completeness_percent", { ascending: false })
+        .order("data_completeness_percent", { ascending: false, nullsFirst: false })
         .limit(5);
 
-      setResults((data as HOA[]) || []);
+      setResults((data as unknown as HOA[]) || []);
       setLoading(false);
     }, 250);
 
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query]);
+    // `supabase` is a module-level singleton, so it is not a dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [term, canSuggest]);
 
   function navigateToHOA(id: string) {
     router.push(`/community/${id}`);
@@ -58,7 +62,8 @@ export function HeroSearch({
   return (
     <div className="max-w-[640px] mx-auto mt-8 md:mt-9 relative">
       <div
-        className="flex items-center gap-2"
+        role="search"
+        className="flex items-center gap-2 ha-focus-shell"
         style={{
           background: "white",
           border: isDark ? "none" : "1px solid var(--color-ha-border-strong)",
@@ -69,15 +74,20 @@ export function HeroSearch({
       >
         <Search
           size={18}
+          aria-hidden="true"
           className="hidden md:block"
           style={{ color: "var(--color-ha-gray)", flexShrink: 0 }}
         />
         <Search
           size={16}
+          aria-hidden="true"
           className="md:hidden"
           style={{ color: "var(--color-ha-gray)", flexShrink: 0 }}
         />
         <input
+          type="search"
+          aria-label="Search HOA records by community name, city, zip code, or subdivision"
+          autoComplete="off"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => {
@@ -89,7 +99,7 @@ export function HeroSearch({
               }
             }
           }}
-          placeholder="Search by address, community name, or zip code"
+          placeholder="Search by community name, city, or zip code"
           className="flex-1 min-w-0 border-0 outline-0 focus:ring-0 focus:outline-none text-[14px] md:text-[15px] bg-transparent py-2.5 md:py-3 px-1"
           style={{
             fontFamily: "var(--font-outfit)",
@@ -113,7 +123,7 @@ export function HeroSearch({
       </div>
 
       {/* Autocomplete dropdown */}
-      {results.length > 0 && (
+      {suggestions.length > 0 && (
         <div
           className="absolute top-[calc(100%+6px)] left-0 right-0 z-10 text-left"
           style={{
@@ -124,7 +134,7 @@ export function HeroSearch({
             padding: 6,
           }}
         >
-          {results.map((hoa) => (
+          {suggestions.map((hoa) => (
             <button
               key={hoa.id}
               onClick={() => navigateToHOA(hoa.id)}
@@ -144,7 +154,7 @@ export function HeroSearch({
                   {hoa.display_name || hoa.legal_name}
                 </div>
                 <div className="text-[11px] truncate" style={{ color: "var(--color-ha-gray)" }}>
-                  {hoa.city}, {hoa.state || "TX"} · {hoa.county}
+                  {hoa.city}, TX · {hoa.county}
                   {hoa.association_type && ` · ${hoa.association_type}`}
                 </div>
               </div>

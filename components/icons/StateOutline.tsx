@@ -35,12 +35,15 @@ export function StateOutline({
   return (
     <svg
       width={svgWidth}
-      height="auto"
       viewBox={state.viewBox}
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       overflow="visible"
-      style={isBackground ? { opacity: 0.12, pointerEvents: "none" } : undefined}
+      style={
+        isBackground
+          ? { height: "auto", opacity: 0.12, pointerEvents: "none" }
+          : { height: "auto" }
+      }
       aria-hidden="true"
     >
       <defs>

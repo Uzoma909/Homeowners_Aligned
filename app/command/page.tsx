@@ -1,14 +1,45 @@
-import { createServiceClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { AdminDashboard } from "./AdminDashboard";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Command | Homeowners Aligned",
+  title: "Command",
+  robots: { index: false, follow: false },
 };
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Defense in depth. proxy.ts already blocks this route for anyone who is not
+ * a signed-in admin, but this page reads with the service-role key, so it
+ * repeats the check itself and never depends on the proxy alone.
+ *
+ * The public sign-in pages were removed for the portfolio build, so nobody
+ * can currently obtain an admin session through the site and this route is
+ * unreachable: the proxy redirects to the home page first.
+ */
+async function requireAdmin() {
+  // Off unless explicitly enabled. See .env.example.
+  if (process.env.ENABLE_ADMIN_DASHBOARD !== "true") notFound();
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) notFound();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || profile.role !== "admin") notFound();
+}
+
 export default async function CommandPage() {
+  await requireAdmin();
+
   const supabase = createServiceClient();
 
   const now = new Date();

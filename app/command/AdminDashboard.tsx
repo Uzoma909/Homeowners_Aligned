@@ -1,8 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+
+/** A row of corrections_queue. Only id and created_at are relied on; the rest is display-only. */
+interface CorrectionRow {
+  id: string;
+  created_at: string;
+  hoa_id?: string | null;
+  field?: string | null;
+  suggestion?: string | null;
+  details?: string | null;
+}
 
 interface AdminDashboardProps {
   stats: {
@@ -21,7 +32,7 @@ interface AdminDashboardProps {
   waitlistEntries: { id: string; first_name: string | null; email: string; state: string | null; zip: string | null; hoa_name: string | null; source: string | null; created_at: string }[];
   stateBreakdown: [string, number][];
   pendingVerifs: { id: string; user_id: string; hoa_id: string; address: string; document_url: string; document_type: string; status: string; created_at: string }[];
-  pendingCorrs: any[];
+  pendingCorrs: CorrectionRow[];
 }
 
 const TABS = [
@@ -88,9 +99,9 @@ export function AdminDashboard({
             <div style={{ fontSize: 11, opacity: 0.5, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>Admin</div>
             <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "var(--font-outfit)" }}>Command Center</div>
           </div>
-          <a href="/" style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, textDecoration: "none" }}>
+          <Link href="/" style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, textDecoration: "none" }}>
             {"Back to site \u2192"}
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -330,7 +341,7 @@ export function AdminDashboard({
             <SectionTitle>Pending corrections ({stats.pendingCorrections})</SectionTitle>
             {pendingCorrs.length > 0 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {pendingCorrs.map((c: any) => (
+                {pendingCorrs.map((c) => (
                   <div
                     key={c.id}
                     style={{

@@ -9,9 +9,9 @@ import { ShieldIcon, FinancialsIcon, MultiUserIcon, StarIcon } from "@/component
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About | Homeowners Aligned",
+  title: "About This Project",
   description:
-    "Learn about Homeowners Aligned, how we score HOAs, and explore homeowner rights in your state.",
+    "What Homeowners Aligned is, how its experimental HOA transparency score works, and how Texas homeowners can request records from their association.",
 };
 
 export default function AboutPage() {
@@ -19,7 +19,7 @@ export default function AboutPage() {
     <div className="min-h-screen">
       <NavBar activePath="/about" />
 
-      <div className="max-w-[1180px] mx-auto px-4 md:px-8 py-10 md:py-16">
+      <main id="main-content" className="max-w-[1180px] mx-auto px-4 md:px-8 py-10 md:py-16">
         <div className="flex gap-10 items-start">
           {/* Sidebar */}
           <AboutSidebar />
@@ -34,7 +34,7 @@ export default function AboutPage() {
                   className="inline-block text-[11px] font-semibold px-3 py-1 rounded-full mb-5"
                   style={{ background: "var(--color-ha-primary)", color: "white" }}
                 >
-                  50 States
+                  State guides
                 </span>
                 <h1
                   className="text-[32px] md:text-[44px] font-semibold leading-[1.1] tracking-tight"
@@ -44,23 +44,23 @@ export default function AboutPage() {
                     letterSpacing: "-0.03em",
                   }}
                 >
-                  Search your state
+                  About Homeowners Aligned
                 </h1>
                 <p
                   className="text-[15px] md:text-[17px] mt-3 mb-8 mx-auto max-w-[520px] leading-relaxed"
                   style={{ color: "var(--color-ha-text-soft)" }}
                 >
-                  Learn how HOAs, POAs, and COAs operate in your state.
-                  Understand your rights as a homeowner.
+                  A portfolio project that turns public HOA filings into searchable
+                  profiles. Pick a state to read its HOA guide.
                 </p>
                 <StateSearch />
                 <p
                   className="text-[12px] mt-4"
                   style={{ color: "var(--color-ha-gray)" }}
                 >
-                  Currently live in{" "}
+                  The dataset and guide cover{" "}
                   <strong style={{ color: "var(--color-ha-primary)" }}>Texas</strong>
-                  {" "}&middot; All other states: join the waitlist
+                  {" "}only &middot; No other states were collected
                 </p>
               </div>
             </section>
@@ -72,7 +72,7 @@ export default function AboutPage() {
                   className="inline-block text-[11px] font-semibold px-3 py-1 rounded-full mb-5"
                   style={{ background: "var(--color-ha-text)", color: "white" }}
                 >
-                  Our mission
+                  About this project
                 </span>
                 <h2
                   className="text-[28px] md:text-[36px] font-semibold leading-[1.1] tracking-tight"
@@ -86,22 +86,30 @@ export default function AboutPage() {
                 </h2>
                 <div className="flex flex-col gap-5 mt-6 text-[15px] leading-relaxed" style={{ color: "var(--color-ha-text-soft)" }}>
                   <p>
-                    78 million Americans live under HOA governance. Most have no easy way to understand
-                    how their community is managed, where their dues go, or whether their board is
-                    acting in their best interest.
+                    Public information about a homeowners association is scattered. In Texas, the
+                    management certificate sits in one state database, the entity filing and officers
+                    in another, and neither is easy to search or compare.
                   </p>
                   <p>
-                    Homeowners Aligned exists to change that. We aggregate public records, surface
-                    governance data, and give every resident a voice through verified reviews and
-                    community discussion.
+                    Homeowners Aligned was started as a possible business to close that gap, by a
+                    homeowner and licensed realtor. It is no longer being commercialized. It now
+                    serves as a working demonstration of the data pipeline behind it: automated
+                    collection of public records, extraction of structured data from filed PDFs,
+                    matching against state entity records, and a transparency score built on the
+                    result.
                   </p>
                   <p>
-                    We are not backed by venture capital. We are not affiliated with any management
-                    company. We are an independent platform built by a homeowner and licensed realtor
-                    who saw the transparency gap firsthand.
+                    The site is read-only. There are no accounts, payments, or forms. It is not
+                    affiliated with any HOA, management company, or government agency.
                   </p>
-                  <p style={{ color: "var(--color-ha-text)", fontWeight: 600 }}>
-                    Transparency builds stronger communities.
+                  <p>
+                    <Link
+                      href="/project"
+                      className="font-semibold hover:underline"
+                      style={{ color: "var(--color-ha-primary)" }}
+                    >
+                      {"Read how it was built \u2192"}
+                    </Link>
                   </p>
                 </div>
               </div>
@@ -124,15 +132,16 @@ export default function AboutPage() {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  How we score every HOA
+                  How every HOA is scored
                 </h2>
                 <p
                   className="text-[15px] mt-4 mb-8 leading-relaxed"
                   style={{ color: "var(--color-ha-text-soft)" }}
                 >
-                  Every HOA on our platform receives a projected Health Score from 0 to 100,
-                  built from four pillars. The score starts with public data and grows as the
-                  community contributes.
+                  Every HOA in the dataset gets a projected score built from four pillars. Each
+                  pillar is a checklist: a checkpoint is met when the matching piece of public
+                  information is on file. The score is experimental and generated by this project.
+                  It measures how much is on record, not how well an HOA is run.
                 </p>
               </div>
 
@@ -160,7 +169,7 @@ export default function AboutPage() {
                     icon: StarIcon,
                     title: "Resident Sentiment",
                     points: "25 pts",
-                    desc: "Verified reviews and community forum activity. What do the people who live there actually think?",
+                    desc: "Resident reviews and forum activity. This pillar was designed but never built, so it is always empty and is left out of the projected score.",
                   },
                 ].map(({ icon: Icon, title, points, desc }) => (
                   <div
@@ -204,13 +213,22 @@ export default function AboutPage() {
                   color: "var(--color-ha-text-soft)",
                 }}
               >
-                <strong style={{ color: "var(--color-ha-text)" }}>Why "Projected" and why is it capped at 75?</strong>
-                {" "}Our scores are currently based on 2 public data sources: Texas Secretary of State
-                and hoa.texas.gov management certificates. The projected score is capped at 75 out of 100
-                because public records alone can only tell part of the story. The remaining 25 points come
-                from community engagement: verified resident reviews, uploaded budgets, reserve studies,
-                and forum activity. An HOA cannot reach 100 without its residents participating. This is
-                by design. Transparency is a two-way street.
+                <strong style={{ color: "var(--color-ha-text)" }}>Why &ldquo;Projected&rdquo; and why is it capped at 75?</strong>
+                {" "}Scores use 2 public data sources: management certificates filed with the Texas
+                Real Estate Commission (hoa.texas.gov) and Texas Comptroller franchise tax records.
+                The projected score is capped at 75 out of 100 because public records only tell part
+                of the story. The remaining points were reserved for information residents would
+                contribute, such as budgets, reserve studies, and reviews. That part of the product
+                was never built, so no HOA can score above 75. An HOA whose entity status is not
+                ACTIVE loses 12 points, and an HOA with fewer than 5 public checkpoints is left
+                unscored.{" "}
+                <Link
+                  href="/project#scoring"
+                  className="font-semibold hover:underline"
+                  style={{ color: "var(--color-ha-primary)" }}
+                >
+                  Full method and limitations
+                </Link>
               </div>
             </section>
 
@@ -238,7 +256,7 @@ export default function AboutPage() {
                   style={{ color: "var(--color-ha-text-soft)" }}
                 >
                   Under Texas Property Code Chapter 209, every homeowner has the legal right
-                  to inspect their HOA's books and records. This includes budgets, reserve studies,
+                  to inspect their HOA&rsquo;s books and records. This includes budgets, reserve studies,
                   meeting minutes, financial statements, and assessment history. Here is exactly
                   how to do it.
                 </p>
@@ -265,7 +283,7 @@ export default function AboutPage() {
                   {
                     step: "4",
                     title: "If they refuse, you have legal recourse",
-                    body: "If your HOA denies access or ignores your request, most states provide a legal path to compel disclosure. In Texas, you can file a petition with the justice of the peace and recover attorney fees and court costs. Your state page on our platform explains the specific enforcement options available to you.",
+                    body: "If your HOA denies access or ignores your request, most states provide a legal path to compel disclosure. In Texas, you can file a petition with the justice of the peace and recover attorney fees and court costs. The Texas guide on this site summarizes the enforcement options.",
                   },
                 ].map(({ step, title, body }) => (
                   <div key={step} className="ha-card p-5 md:p-6 flex gap-4" style={{ boxShadow: "none" }}>
@@ -337,12 +355,14 @@ export default function AboutPage() {
               <p className="text-[12px] mt-4" style={{ color: "var(--color-ha-gray)" }}>
                 Source: Texas Property Code Chapter 209, Section 209.005.{" "}
                 
-                 <a href="/about/tx#records"
+                <Link
+                  href="/about/tx#records"
                   className="font-semibold no-underline hover:underline"
                   style={{ color: "var(--color-ha-primary)" }}
                 >
                   Read the full breakdown →
-                </a>
+                </Link>
+                {" "}This is a general summary for educational purposes, not legal advice.
               </p>
             </section>
 
@@ -363,14 +383,14 @@ export default function AboutPage() {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  {"What you\u2019ll see"}
+                  What a profile shows
                 </h2>
                 <p
                   className="text-[15px] mt-4 mb-8 leading-relaxed"
                   style={{ color: "var(--color-ha-text-soft)" }}
                 >
-                  Every HOA profile is a complete transparency snapshot. Here is what we surface
-                  for each community.
+                  Every HOA profile is a snapshot of what public records say about that
+                  community, with its sources and retrieval dates.
                 </p>
               </div>
 
@@ -390,15 +410,15 @@ export default function AboutPage() {
                   },
                   {
                     title: "Entity Status Alerts",
-                    desc: "If an HOA has been forfeited or involuntarily terminated, we flag it immediately with context on what it means.",
+                    desc: "If an HOA's entity status is forfeited or involuntarily ended, the profile flags it with context on what that means.",
                   },
                   {
-                    title: "Verified Reviews",
-                    desc: "Address-verified residents rate their HOA across five categories. One review per address per year.",
+                    title: "Sources & Dates",
+                    desc: "Each section names the public source it came from, and the profile shows when each source was retrieved.",
                   },
                   {
-                    title: "Community Forum",
-                    desc: "A private, verified-resident discussion board for your community. Public threads visible, full access requires signup.",
+                    title: "What Is Missing",
+                    desc: "Open checkpoints show which records are not on file, so an empty field is visible rather than hidden.",
                   },
                 ].map(({ title, desc }) => (
                   <div
@@ -421,7 +441,11 @@ export default function AboutPage() {
                 ))}
               </div>
 
-              <div className="mt-6">
+              <p className="text-[12px] mt-6 mb-2" style={{ color: "var(--color-ha-gray)" }}>
+                Illustration with made-up sample data. It includes sections (assessments,
+                reviews) that were designed but are not in the live profiles.
+              </p>
+              <div>
                 <ProfilePreview />
               </div>
             </section>
@@ -433,7 +457,7 @@ export default function AboutPage() {
                   className="inline-block text-[11px] font-semibold px-3 py-1 rounded-full mb-5"
                   style={{ background: "var(--color-ha-primary)", color: "white" }}
                 >
-                  Coming soon
+                  Design concept &middot; Not built
                 </span>
                 <h2
                   className="text-[28px] md:text-[36px] font-semibold leading-[1.1] tracking-tight"
@@ -443,15 +467,15 @@ export default function AboutPage() {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  Your community dashboard
+                  Resident dashboard concept
                 </h2>
                 <p
                   className="text-[15px] mt-4 mb-8 leading-relaxed"
                   style={{ color: "var(--color-ha-text-soft)" }}
                 >
-                  Track your monthly assessment, reserve fund health, board meeting
-                  schedules, and community activity. All in one place, updated by
-                  verified residents like you.
+                  A planned view for tracking monthly assessments, reserve fund health, board
+                  meeting schedules, and community activity. Only the interface mockup below
+                  exists. It uses sample data and has no backend.
                 </p>
               </div>
 
@@ -467,7 +491,7 @@ export default function AboutPage() {
                   className="inline-block text-[11px] font-semibold px-3 py-1 rounded-full mb-5"
                   style={{ background: "var(--color-ha-primary)", color: "white" }}
                 >
-                  Coming soon
+                  Design concept &middot; Not built
                 </span>
                 <h2
                   className="text-[28px] md:text-[36px] font-semibold leading-[1.1] tracking-tight"
@@ -477,14 +501,15 @@ export default function AboutPage() {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  Community-first discussion
+                  Community forum concept
                 </h2>
                 <p
                   className="text-[15px] mt-4 mb-8 leading-relaxed"
                   style={{ color: "var(--color-ha-text-soft)" }}
                 >
-                  Every HOA gets a private discussion board. Verified residents can share updates,
-                  ask questions, and hold their board accountable in a space that belongs to them.
+                  The original product plan gave each HOA a discussion board for verified
+                  residents. It was designed but not built. The cards and mockup below describe
+                  the intended behavior and use sample data.
                 </p>
               </div>
 
@@ -492,19 +517,19 @@ export default function AboutPage() {
                 {[
                   {
                     title: "Public threads",
-                    desc: "Titles and previews visible to everyone. Full content requires a free account.",
+                    desc: "Planned: titles and previews visible to everyone, full threads for signed-in residents.",
                   },
                   {
                     title: "Verified posting",
-                    desc: "Only address-verified residents can create threads and reply. No anonymous trolling.",
+                    desc: "Planned: only address-verified residents could create threads and reply.",
                   },
                   {
                     title: "Board responses",
-                    desc: "HOA boards can claim their profile and respond directly to resident concerns.",
+                    desc: "Planned: HOA boards could claim their profile and respond to resident concerns.",
                   },
                   {
                     title: "Categorized topics",
-                    desc: "Financial, maintenance, board elections, rules, amenities — organized by what matters.",
+                    desc: "Planned: threads grouped by topic, such as financial, maintenance, elections, rules, and amenities.",
                   },
                 ].map(({ title, desc }) => (
                   <div
@@ -556,27 +581,27 @@ export default function AboutPage() {
                       letterSpacing: "-0.02em",
                     }}
                   >
-                    Ready to hold your HOA accountable?
+                    See how the system was built
                   </h2>
                   <p className="text-[15px] md:text-[17px] opacity-85 mt-4 mb-7 leading-relaxed">
-                    Create a free account to leave verified reviews, access community boards,
-                    and help build your {"community\u2019s"} transparency profile.
+                    The technical case study covers the data sources, the document-parsing
+                    pipeline, the database, the scoring method, and the known limitations.
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <a
-                      href="/auth/register"
+                    <Link
+                      href="/project"
                       className="inline-block text-[14px] font-semibold px-6 py-3 rounded-[10px] no-underline"
                       style={{ background: "white", color: "var(--color-ha-deep)" }}
                     >
-                      Create free account
-                    </a>
-                    <a
-                      href="/"
+                      Read the case study
+                    </Link>
+                    <Link
+                      href="/search"
                       className="inline-block text-[14px] font-semibold px-6 py-3 rounded-[10px] no-underline"
                       style={{ background: "rgba(255,255,255,0.15)", color: "white" }}
                     >
-                      Search HOAs
-                    </a>
+                      Explore the dataset
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -584,7 +609,7 @@ export default function AboutPage() {
 
           </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>

@@ -1,60 +1,73 @@
 /* ─── HOA Core ─── */
 export type AssociationType = "POA" | "COA";
 
-export type EntityStatus =
-  | "ACTIVE"
-  | "FORFEITED"
-  | "TERMINATED"
-  | "WITHDRAWN"
-  | null;
+/**
+ * Entity status as returned by the Texas Comptroller Franchise Tax API
+ * (`rightToTransactTX`). Null when no Comptroller match was found.
+ */
+export type EntityStatus = string | null;
 
+/**
+ * A row of the `hoas` table. Column names match the database
+ * (see pipeline/supabase_schema.sql and supabase/migrations/001_web_app_schema.sql).
+ * Public pages select only a subset of these columns, so most are optional here.
+ */
 export interface HOA {
   id: string;
   legal_name: string;
   display_name: string | null;
+  association_name?: string | null;
   county: string;
-  state: string;
+  state?: string;
   city: string;
-  zip: string;
+  zip: string | null;
   association_type: AssociationType | null;
   subdivision_name: string | null;
-  management_company_name: string | null;
-  management_company_phone: string | null;
-  management_company_email: string | null;
-  management_company_website: string | null;
-  management_company_address: string | null;
-  association_address: string | null;
+  mgmt_company_name: string | null;
+  mgmt_company_phone: string | null;
+  mgmt_company_email: string | null;
+  mgmt_company_website: string | null;
+  mgmt_company_address?: string | null;
+  association_address?: string | null;
   association_website: string | null;
   entity_status: EntityStatus;
-  sos_file_number: string | null;
-  formation_date: string | null;
-  taxpayer_id: string | null;
+  sos_file_number?: string | null;
+  sos_effective_date: string | null;
+  taxpayer_id?: string | null;
   certificate_url: string | null;
-  total_units: number | null;
-  health_score: number | null;
-  health_score_updated_at: string | null;
-  data_completeness_percent: number;
-  claimed: boolean;
-  created_at: string;
-  updated_at: string;
+  recording_instrument_number: string | null;
+  registered_agent_name: string | null;
+  total_units?: number | null;
+  health_score?: number | null;
+  health_score_updated_at?: string | null;
+  data_completeness_percent: number | null;
+  claimed?: boolean;
+  scraped_at?: string | null;
+  processed_at?: string | null;
+  comptroller_processed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  /** Embedded row counts, present when selected as `hoa_officers(count)` / `hoa_fees(count)`. */
+  hoa_officers?: { count: number }[];
+  hoa_fees?: { count: number }[];
 }
 
 export interface HOAOfficer {
   id: string;
-  hoa_id: string;
+  hoa_id?: string;
   name: string;
   title: string | null;
-  active_year: number | null;
-  source: string;
-  created_at: string;
+  active_year: string | number | null;
+  source?: string;
+  created_at?: string;
 }
 
 export interface HOAFee {
   id: string;
-  hoa_id: string;
+  hoa_id?: string;
   fee_type: string;
   amount: number | null;
-  created_at: string;
+  created_at?: string;
 }
 
 /* ─── Health Score ─── */
@@ -75,7 +88,7 @@ export interface HealthScore {
 
 export type ScoreTier = "green" | "amber" | "red" | "gray";
 
-/* ─── Users ─── */
+/* ─── Users (admin dashboard only) ─── */
 export type UserRole = "user" | "agent" | "inspector" | "admin";
 
 export type DisplayPreference =
@@ -97,7 +110,7 @@ export interface Profile {
   created_at: string;
 }
 
-/* ─── Reviews ─── */
+/* ─── Reviews (schema exists; feature was never built) ─── */
 export type OwnershipStatus = "current_owner" | "former_owner" | "renter";
 
 export type MeetingAttendance =
@@ -130,7 +143,7 @@ export interface Review {
   moderation_status: "pending" | "approved" | "flagged" | "rejected";
 }
 
-/* ─── Forum ─── */
+/* ─── Forum (designed; no table or feature was built) ─── */
 export type ForumVisibility = "public" | "private";
 
 export type ForumCategory =
@@ -156,7 +169,7 @@ export interface ForumPost {
   created_at: string;
 }
 
-/* ─── Waitlist ─── */
+/* ─── Waitlist (table exists; the sign-up form was removed) ─── */
 export type WaitlistSource =
   | "organic"
   | "state_page"

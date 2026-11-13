@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { WordMark } from "@/components/icons/Logo";
-import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Search" },
+  { href: "/search", label: "HOA Records" },
   { href: "/about", label: "About" },
-  { href: "/blog", label: "Blog" },
+  { href: "/project", label: "How It Was Built" },
 ] as const;
 
 interface NavBarProps {
@@ -19,35 +18,6 @@ interface NavBarProps {
 
 export function NavBar({ activePath }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState<{ email?: string; full_name?: string } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const supabase = createClient();
-
-  useEffect(() => {
-    async function checkAuth() {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        setUser({
-          email: authUser.email,
-          full_name: authUser.user_metadata?.full_name || authUser.email?.split("@")[0],
-        });
-      }
-      setLoading(false);
-    }
-    checkAuth();
-  }, []);
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    setUser(null);
-    router.push("/");
-    router.refresh();
-  }
-
-  const initials = user?.full_name
-    ? user.full_name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
-    : "?";
 
   return (
     <header
@@ -59,11 +29,19 @@ export function NavBar({ activePath }: NavBarProps) {
         borderBottom: "1px solid var(--color-ha-border)",
       }}
     >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[60] focus:px-3 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold"
+        style={{ background: "var(--color-ha-text)", color: "white" }}
+      >
+        Skip to content
+      </a>
+
       <div className="max-w-[1180px] mx-auto px-4 md:px-6 flex items-center h-14 md:h-16 relative">
         {/* Logo */}
-        <Link href="/" className="flex-shrink-0">
-          {/* Mobile: compact */}
-          <div className="md:hidden flex items-end gap-1.5">
+        <Link href="/" className="flex-shrink-0" aria-label="Homeowners Aligned home">
+          {/* Mobile and tablet: compact, so the centered nav has room */}
+          <div className="lg:hidden flex items-end gap-1.5">
             <img src="/icons/mark-purple-transparent.svg" alt="" width={24} height={24} />
             <span
               className="font-semibold leading-none"
@@ -79,20 +57,24 @@ export function NavBar({ activePath }: NavBarProps) {
             </span>
           </div>
           {/* Desktop: full wordmark */}
-          <span className="hidden md:block">
+          <span className="hidden lg:block">
             <WordMark size={20} />
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+        <nav
+          aria-label="Main"
+          className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2"
+        >
           {NAV_LINKS.map(({ href, label }) => {
             const isActive = activePath === href;
             return (
               <Link
                 key={href}
                 href={href}
-                className="text-sm transition-colors"
+                aria-current={isActive ? "page" : undefined}
+                className="text-sm transition-colors whitespace-nowrap"
                 style={{
                   color: isActive
                     ? "var(--color-ha-primary)"
@@ -110,60 +92,29 @@ export function NavBar({ activePath }: NavBarProps) {
           })}
         </nav>
 
-        {/* Desktop actions */}
-        <div className="hidden md:flex items-center gap-3 ml-auto mr-0">
-          {!loading && (
-            <>
-              {user ? (
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleSignOut}
-                    className="text-sm font-medium cursor-pointer bg-transparent border-0"
-                    style={{ color: "var(--color-ha-text-soft)", fontFamily: "inherit" }}
-                  >
-                    Sign out
-                  </button>
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold"
-                    style={{
-                      background: "linear-gradient(135deg, #a78bfa, #7c3aed)",
-                      color: "white",
-                    }}
-                  >
-                    {initials}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <Link
-                    href="/auth/login"
-                    className="text-sm font-medium"
-                    style={{ color: "var(--color-ha-text-soft)" }}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    className="text-sm font-semibold px-4 py-2 rounded-[10px]"
-                    style={{
-                      background: "var(--color-ha-text)",
-                      color: "white",
-                    }}
-                  >
-                    Get started
-                  </Link>
-                </>
-              )}
-            </>
-          )}
+        {/* Desktop: project status */}
+        <div className="hidden md:flex items-center ml-auto mr-0">
+          <Link
+            href="/disclaimer"
+            className="text-[11px] font-semibold px-3 py-1.5 rounded-full no-underline whitespace-nowrap"
+            style={{
+              background: "var(--color-ha-surface)",
+              color: "var(--color-ha-deep)",
+              border: "1px solid var(--color-ha-border-strong)",
+            }}
+          >
+            Portfolio project
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden ml-auto p-2 -mr-2"
+          className="md:hidden ml-auto p-2 -mr-2 bg-transparent border-0 cursor-pointer"
           style={{ color: "var(--color-ha-text)" }}
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -172,18 +123,20 @@ export function NavBar({ activePath }: NavBarProps) {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div
+          id="mobile-nav"
           className="md:hidden border-t"
           style={{
             borderColor: "var(--color-ha-border)",
             background: "white",
           }}
         >
-          <nav className="flex flex-col px-4 py-3 gap-1">
+          <nav aria-label="Main" className="flex flex-col px-4 py-3 gap-1">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setMobileOpen(false)}
+                aria-current={activePath === href ? "page" : undefined}
                 className="py-3 text-[15px] font-medium"
                 style={{
                   color:
@@ -196,69 +149,14 @@ export function NavBar({ activePath }: NavBarProps) {
                 {label}
               </Link>
             ))}
-
-            {!loading && (
-              <div className="flex flex-col gap-2 pt-4 pb-2">
-                {user ? (
-                  <>
-                    <div className="flex items-center gap-3 py-2">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold"
-                        style={{ background: "linear-gradient(135deg, #a78bfa, #7c3aed)", color: "white" }}
-                      >
-                        {initials}
-                      </div>
-                      <div>
-                        <div className="text-[14px] font-semibold" style={{ color: "var(--color-ha-text)" }}>
-                          {user.full_name}
-                        </div>
-                        <div className="text-[12px]" style={{ color: "var(--color-ha-gray)" }}>
-                          {user.email}
-                        </div>
-                      </div>
-                    </div>
-                    <span />
-                    <button
-                      onClick={() => { handleSignOut(); setMobileOpen(false); }}
-                      className="py-3 text-sm font-semibold rounded-[10px] cursor-pointer"
-                      style={{
-                        border: "1px solid var(--color-ha-border)",
-                        background: "white",
-                        color: "var(--color-ha-text)",
-                        fontFamily: "inherit",
-                      }}
-                    >
-                      Sign out
-                    </button>
-                  </>
-                ) : (
-                  <div className="flex gap-3">
-                    <Link
-                      href="/auth/login"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex-1 text-center py-3 text-sm font-semibold rounded-[10px]"
-                      style={{
-                        border: "1px solid var(--color-ha-border)",
-                        color: "var(--color-ha-text)",
-                      }}
-                    >
-                      Sign in
-                    </Link>
-                    <Link
-                      href="/auth/register"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex-1 text-center py-3 text-sm font-semibold rounded-[10px]"
-                      style={{
-                        background: "var(--color-ha-primary)",
-                        color: "white",
-                      }}
-                    >
-                      Get started
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
+            <Link
+              href="/disclaimer"
+              onClick={() => setMobileOpen(false)}
+              className="py-3 text-[13px] font-medium"
+              style={{ color: "var(--color-ha-gray)" }}
+            >
+              Portfolio project: read the disclaimer
+            </Link>
           </nav>
         </div>
       )}

@@ -1,24 +1,17 @@
 {
   "name": "Homeowners Aligned",
   "short_name": "HOA Aligned",
-  "description": "The first independent Health Score for HOAs. Honest. Open. Accountable.",
+  "description": "A data engineering portfolio project built on public Texas HOA records.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#7c3aed",
-  "orientation": "portrait-primary",
   "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

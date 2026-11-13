@@ -346,7 +346,7 @@ export function ProfilePreview() {
               ))}
             </div>
             <div className="text-[10px] mt-2 pt-2 text-center" style={{ borderTop: "1px solid var(--color-ha-border)", color: "var(--color-ha-gray)" }}>
-              {mode === "good" ? "+4 more board members \u00b7 Sign up to view all" : "2 vacant seats \u00b7 No election scheduled"}
+              {mode === "good" ? "+4 more board members" : "2 vacant seats \u00b7 No election scheduled"}
             </div>
           </div>
 
@@ -411,7 +411,7 @@ export function ProfilePreview() {
               ))}
             </div>
             <div className="text-[10px] mt-2 pt-2 text-center" style={{ borderTop: "1px solid var(--color-ha-border)", color: "var(--color-ha-gray)" }}>
-              Sign up to leave a verified review
+              Resident reviews were designed but not built
             </div>
           </div>
 
