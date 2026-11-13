@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TriangleAlertAmberIcon, ChevronRightIcon } from "@/components/icons/hoa-icons";
+import { TriangleAlertAmberIcon } from "@/components/icons/hoa-icons";
 
 interface EntityWarningProps {
   entityStatus: string;
@@ -12,7 +12,7 @@ export function EntityWarning({ entityStatus }: EntityWarningProps) {
 
   const description = entityStatus.includes("FRANCHISE TAX")
     ? "This HOA\u2019s charter was involuntarily terminated for failing to file or pay Texas franchise tax. This is a red flag that may indicate governance or financial management issues. The HOA may still operate day-to-day, but its legal standing with the state is compromised."
-    : `This HOA\u2019s entity status is listed as \u201c${entityStatus}\u201d with the Texas Secretary of State. This may affect the HOA\u2019s legal standing and ability to enforce deed restrictions.`;
+    : `This HOA\u2019s entity status is listed as \u201c${entityStatus}\u201d in Texas Comptroller records. This may affect the HOA\u2019s legal standing and ability to enforce deed restrictions.`;
 
   return (
     <div className="max-w-[1180px] mx-auto px-4 md:px-6 pb-4">
@@ -26,6 +26,7 @@ export function EntityWarning({ entityStatus }: EntityWarningProps) {
         {/* Header — always visible, tappable on mobile */}
         <button
           onClick={() => setOpen(!open)}
+          aria-expanded={open}
           className="md:hidden w-full flex items-center gap-3 p-4 cursor-pointer bg-transparent border-0 text-left"
           style={{ fontFamily: "inherit" }}
         >
@@ -65,13 +66,13 @@ export function EntityWarning({ entityStatus }: EntityWarningProps) {
               {description}
             </p>
             
-            <a href="https://www.sos.state.tx.us"
+            <a href="https://mycpa.cpa.state.tx.us/coa/"
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="inline-block text-[12px] font-semibold mt-2 hover:underline"
               style={{ color: "var(--color-ha-primary)" }}
             >
-              {"Verify on Texas SOS \u2192"}
+              {"Check the current status with the Texas Comptroller \u2192"}
             </a>
           </div>
         )}
@@ -95,13 +96,13 @@ export function EntityWarning({ entityStatus }: EntityWarningProps) {
               {description}
             </p>
             
-            <a  href="https://www.sos.state.tx.us"
+            <a href="https://mycpa.cpa.state.tx.us/coa/"
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               className="inline-block text-[12px] font-semibold mt-2 hover:underline"
               style={{ color: "var(--color-ha-primary)" }}
             >
-              {"Verify on Texas SOS \u2192"}
+              {"Check the current status with the Texas Comptroller \u2192"}
             </a>
           </div>
         </div>

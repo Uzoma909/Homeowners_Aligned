@@ -1,7 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Space_Mono } from "next/font/google";
 import "./globals.css";
-import { SignupNudge } from "@/components/ui/SignupNudge";
+import { IntroGate } from "@/components/portfolio/IntroGate";
+import {
+  INTRO_STORAGE_KEY,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -16,28 +22,27 @@ const spaceMono = Space_Mono({
   display: "swap",
 });
 
+const TITLE = "Homeowners Aligned | HOA Data Engineering Portfolio Project";
+
 export const metadata: Metadata = {
   title: {
-    default: "Homeowners Aligned | HOA Transparency Platform",
+    default: TITLE,
     template: "%s | Homeowners Aligned",
   },
-  description:
-    "The first independent Health Score for HOAs. Check your community's financial health, governance quality, and resident satisfaction — for free.",
+  description: SITE_DESCRIPTION,
   manifest: "/manifest.json",
-  metadataBase: new URL("https://homeownersaligned.com"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Homeowners Aligned",
-    title: "Homeowners Aligned | HOA Transparency Platform",
-    description:
-      "The first independent Health Score for HOAs. Check your community's financial health, governance quality, and resident satisfaction — for free.",
+    siteName: SITE_NAME,
+    title: TITLE,
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Homeowners Aligned | HOA Transparency Platform",
-    description:
-      "The first independent Health Score for HOAs. Honest. Open. Accountable.",
+    title: TITLE,
+    description: SITE_DESCRIPTION,
   },
   icons: {
     icon: "/favicon.svg",
@@ -49,8 +54,15 @@ export const viewport: Viewport = {
   themeColor: "#7c3aed",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
+
+/**
+ * Runs before first paint. If the intro screen was already dismissed in this
+ * browser session, mark <html> so CSS hides it immediately (no flash).
+ */
+const INTRO_SEEN_SCRIPT = `try{if(sessionStorage.getItem(${JSON.stringify(
+  INTRO_STORAGE_KEY
+)})==="1"){document.documentElement.setAttribute("data-intro-seen","1")}}catch(e){}`;
 
 export default function RootLayout({
   children,
@@ -61,10 +73,17 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${outfit.variable} ${spaceMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SEEN_SCRIPT }} />
+        <noscript>
+          <style>{`#intro-gate{display:none!important}`}</style>
+        </noscript>
+      </head>
       <body className="min-h-screen">
-        {children}
-        <SignupNudge />
+        <div id="app-root">{children}</div>
+        <IntroGate />
       </body>
     </html>
   );

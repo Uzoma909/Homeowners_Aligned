@@ -214,7 +214,7 @@ export function ForumPreview() {
       {/* Label */}
       <div className="px-5 py-3 text-center" style={{ borderTop: "1px solid var(--color-ha-border)", background: "white" }}>
         <span className="text-[11px] font-semibold" style={{ color: "var(--color-ha-gray)" }}>
-          Community Forum &middot; Verified residents only
+          Community forum &middot; Design concept with sample data &middot; Not built
         </span>
       </div>
     </div>

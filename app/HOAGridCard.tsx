@@ -3,14 +3,27 @@
 import Link from "next/link";
 import { ScoreBadge } from "@/components/ui";
 import { MapPinIcon } from "@/components/icons/hoa-icons";
+import { calculateProjectedScore } from "@/lib/scoring";
+import { buildScoringInput, embeddedCount } from "@/lib/hoa";
 import type { HOA } from "@/types";
 
 interface HOAGridCardProps {
   hoa: HOA;
 }
 
+function getProjectedScore(hoa: HOA): number | null {
+  const result = calculateProjectedScore(
+    buildScoringInput(hoa, {
+      officers: embeddedCount(hoa.hoa_officers),
+      fees: embeddedCount(hoa.hoa_fees),
+    })
+  );
+  return result.projectedScore;
+}
+
 export function HOAGridCard({ hoa }: HOAGridCardProps) {
   const name = hoa.display_name || hoa.legal_name;
+  const completeness = hoa.data_completeness_percent ?? 0;
 
   return (
     <Link
@@ -38,7 +51,7 @@ export function HOAGridCard({ hoa }: HOAGridCardProps) {
             {hoa.association_type && ` · ${hoa.association_type}`}
           </div>
         </div>
-        <ScoreBadge score={hoa.health_score} size={48} showLabel={false} />
+        <ScoreBadge score={getProjectedScore(hoa)} size={48} showLabel={false} />
       </div>
 
       {/* Completeness bar */}
@@ -57,7 +70,7 @@ export function HOAGridCard({ hoa }: HOAGridCardProps) {
               color: "var(--color-ha-text)",
             }}
           >
-            {hoa.data_completeness_percent}%
+            {completeness}%
           </span>
         </div>
         <div
@@ -67,11 +80,11 @@ export function HOAGridCard({ hoa }: HOAGridCardProps) {
           <div
             className="h-full rounded-full transition-all"
             style={{
-              width: `${hoa.data_completeness_percent}%`,
+              width: `${completeness}%`,
               background:
-                hoa.data_completeness_percent >= 70
+                completeness >= 70
                   ? "var(--color-score-green)"
-                  : hoa.data_completeness_percent >= 40
+                  : completeness >= 40
                     ? "var(--color-ha-primary)"
                     : "var(--color-ha-light)",
             }}

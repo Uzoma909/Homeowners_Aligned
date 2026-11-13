@@ -1,27 +1,30 @@
 import Link from "next/link";
 import { WordMark } from "@/components/icons/Logo";
+import { REPO_URL } from "@/lib/site";
 
 const FOOTER_SECTIONS = [
   {
-    title: "Product",
+    title: "Explore",
     links: [
-      { label: "HOA Profiles", href: "/" },
-      { label: "Health Score Methodology", href: "/methodology" },
-      { label: "For Residents", href: "/residents" },
-      { label: "For Buyers", href: "/buyers" },
+      { label: "Search HOAs", href: "/" },
+      { label: "Browse HOA Records", href: "/search" },
+      { label: "Texas HOA Guide", href: "/about/tx" },
+      { label: "Score Methodology", href: "/about#scoring" },
     ],
   },
   {
-    title: "Business",
+    title: "Project",
     links: [
-      { label: "For Agents", href: "/agents" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "How It Was Built", href: "/project" },
+      { label: "Technical Architecture", href: "/project#architecture" },
+      { label: "Data Methodology", href: "/project#collection" },
+      { label: "About This Project", href: "/about" },
     ],
   },
   {
-    title: "Company",
+    title: "Notices",
     links: [
-      { label: "About", href: "/about" },
+      { label: "Project Disclaimer", href: "/disclaimer" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
       { label: "Contact", href: "/contact" },
@@ -55,14 +58,25 @@ export function Footer() {
               className="mt-4 text-[12.5px] leading-relaxed max-w-[320px]"
               style={{ color: "var(--color-ha-gray)" }}
             >
-              An independent transparency platform for the 78 million Americans
-              living under HOA governance.
+              A data engineering portfolio project built on public Texas HOA
+              records. Not an active commercial service.
             </p>
+            {REPO_URL && (
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 text-[12.5px] font-semibold hover:underline"
+                style={{ color: "var(--color-ha-primary)" }}
+              >
+                {"View source on GitHub →"}
+              </a>
+            )}
           </div>
 
           {/* Nav columns */}
           {FOOTER_SECTIONS.map(({ title, links }) => (
-            <div key={title}>
+            <nav key={title} aria-label={title}>
               <div
                 className="text-xs font-semibold uppercase tracking-wide mb-4"
                 style={{ color: "var(--color-ha-text)" }}
@@ -82,18 +96,39 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
+        </div>
+      </div>
+
+      {/* Disclaimer strip */}
+      <div style={{ borderTop: "1px solid var(--color-ha-border)" }}>
+        <div
+          className="max-w-[1180px] mx-auto px-4 md:px-8 py-4 text-xs leading-relaxed"
+          style={{ color: "var(--color-ha-gray)" }}
+        >
+          Technical portfolio demonstration. Records come from public sources and
+          may be incomplete, outdated, or inaccurate. Scores are experimental
+          and are not official evaluations. Not affiliated with any homeowners
+          association or government agency.{" "}
+          <Link
+            href="/disclaimer"
+            className="font-semibold hover:underline"
+            style={{ color: "var(--color-ha-primary)" }}
+          >
+            Read the full disclaimer
+          </Link>
         </div>
       </div>
 
       {/* Bottom bar */}
       <div style={{ borderTop: "1px solid var(--color-ha-border)" }}>
-        <div className="max-w-[1180px] mx-auto px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between gap-2 text-xs"
+        <div
+          className="max-w-[1180px] mx-auto px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between gap-2 text-xs"
           style={{ color: "var(--color-ha-gray)" }}
         >
           <span>© 2026 Homeowners Aligned</span>
-          <span>Made for residents. Transparency builds stronger communities.</span>
+          <span>Built as a software and data engineering showcase.</span>
         </div>
       </div>
     </footer>

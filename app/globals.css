@@ -203,3 +203,29 @@ input:focus, input:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
+
+/* Inputs drop their own outline (above), so the wrapper that looks like the
+   field shows the keyboard focus ring instead. */
+.ha-focus-shell:focus-within {
+  outline: 2px solid var(--color-ha-primary);
+  outline-offset: 2px;
+}
+
+/* ─── Intro screen (components/portfolio/IntroGate.tsx) ───
+   The inline script in app/layout.tsx sets data-intro-seen before first paint
+   when the screen was already dismissed in this browser session. */
+html[data-intro-seen] #intro-gate {
+  display: none;
+}
+
+/* ─── Respect reduced-motion preferences ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

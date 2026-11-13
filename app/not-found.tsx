@@ -6,7 +6,7 @@ export default function NotFound() {
     <div className="min-h-screen flex flex-col">
       <NavBar />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-20 md:py-32">
+      <main id="main-content" className="flex-1 flex items-center justify-center px-4 py-20 md:py-32">
         <div className="text-center max-w-[480px]">
           <span
             className="text-[64px] md:text-[80px] font-bold"
@@ -33,8 +33,8 @@ export default function NotFound() {
             className="text-[15px] mt-3 leading-relaxed"
             style={{ color: "var(--color-ha-text-soft)" }}
           >
-            The page you are looking for does not exist or may have been moved.
-            Try searching for an HOA or head back home.
+            The page or HOA record you are looking for does not exist, or it was
+            removed from the dataset. Try searching for an HOA or head back home.
           </p>
           <div className="flex justify-center gap-3 mt-6">
             <Link

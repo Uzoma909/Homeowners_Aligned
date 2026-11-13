@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { NavBar, Footer } from "@/components/layout";
 import { STATE_PATHS, type StateCode } from "@/components/icons/state-paths";
 import { StateOutline, getStateName } from "@/components/icons/StateOutline";
-import { StateWaitlist } from "./StateWaitlist";
 import { StateSidebar } from "./StateSidebar";
 import type { Metadata } from "next";
 
@@ -15,10 +15,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const code = state.toUpperCase();
   if (!(code in STATE_PATHS)) return { title: "State Not Found" };
   const name = getStateName(code);
+  const isActive = ACTIVE_STATES.includes(code);
 
   return {
-    title: `${name} HOA Guide | Homeowners Aligned`,
-    description: `Learn how HOAs, POAs, and COAs operate in ${name}. Understand your homeowner rights.`,
+    title: `${name} HOA Guide`,
+    description: isActive
+      ? `How HOAs, POAs, and COAs operate in ${name}: the governing statutes, records access, meetings, and where public HOA records are filed.`
+      : `${name} is not covered by this portfolio project, which collected public HOA records for Texas only.`,
+    // Only states with real content are worth indexing.
+    robots: isActive ? undefined : { index: false, follow: true },
   };
 }
 
@@ -66,7 +71,7 @@ function InactiveStatePage({ code, name }: { code: StateCode; name: string }) {
     <div className="min-h-screen">
       <NavBar activePath="/about" />
 
-      <main className="max-w-[1180px] mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-12 md:pb-20 relative">
+      <main id="main-content" className="max-w-[1180px] mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-12 md:pb-20 relative">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden" aria-hidden="true">
           <StateOutline code={code} variant="background" />
         </div>
@@ -81,27 +86,60 @@ function InactiveStatePage({ code, name }: { code: StateCode; name: string }) {
             style={{ background: "var(--color-ha-text)", color: "white" }}
           >
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--color-ha-primary)" }} />
-            Coming soon
+            Not in this dataset
           </span>
 
           <h1
             className="text-[28px] md:text-[36px] font-semibold leading-[1.1] tracking-tight"
             style={{ fontFamily: "var(--font-outfit)", color: "var(--color-ha-text)", letterSpacing: "-0.025em" }}
           >
-            {"We\u2019re not in " + name + " yet"}
+            {name + " is not covered"}
           </h1>
 
-          <p className="text-[15px] mt-3 mb-8 leading-relaxed mx-auto max-w-[380px]" style={{ color: "var(--color-ha-text-soft)" }}>
-            {"Join the waitlist to help us get there. We\u2019ll notify you when Homeowners Aligned launches in your state."}
+          <p className="text-[15px] mt-3 mb-8 leading-relaxed mx-auto max-w-[400px]" style={{ color: "var(--color-ha-text-soft)" }}>
+            This portfolio project only collected records for Texas, where the
+            state publishes HOA management certificates as open data. No
+            records for {name} were gathered, and the project is not being
+            expanded.
           </p>
 
           <div className="ha-card-frosted p-6 md:p-8 text-left">
-            <StateWaitlist stateCode={code} stateName={name} />
+            <h2
+              className="text-[16px] font-semibold"
+              style={{ fontFamily: "var(--font-outfit)", color: "var(--color-ha-text)" }}
+            >
+              What you can explore instead
+            </h2>
+            <ul className="flex flex-col gap-3 mt-4 text-[14px]">
+              <li>
+                <Link
+                  href="/about/tx"
+                  className="font-semibold hover:underline"
+                  style={{ color: "var(--color-ha-primary)" }}
+                >
+                  {"The Texas HOA guide \u2192"}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/search"
+                  className="font-semibold hover:underline"
+                  style={{ color: "var(--color-ha-primary)" }}
+                >
+                  {"Dallas-Fort Worth HOA records \u2192"}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/project"
+                  className="font-semibold hover:underline"
+                  style={{ color: "var(--color-ha-primary)" }}
+                >
+                  {"How the data pipeline was built \u2192"}
+                </Link>
+              </li>
+            </ul>
           </div>
-
-          <p className="text-[12px] mt-6" style={{ color: "var(--color-ha-gray)" }}>
-            Every signup helps us prioritize which state we expand to next.
-          </p>
         </div>
       </main>
 
@@ -118,7 +156,7 @@ function ActiveStatePage({ code, name }: { code: StateCode; name: string }) {
     <div className="min-h-screen">
       <NavBar activePath="/about" />
 
-      <main className="max-w-[1180px] mx-auto px-4 md:px-8 py-10 md:py-16">
+      <main id="main-content" className="max-w-[1180px] mx-auto px-4 md:px-8 py-10 md:py-16">
         <div className="flex gap-10">
           {/* Main content */}
           <div className="flex-1 min-w-0">
@@ -143,7 +181,7 @@ function ActiveStatePage({ code, name }: { code: StateCode; name: string }) {
                     style={{ background: "var(--color-ha-primary)", color: "white" }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ background: "white" }} />
-                    Live
+                    Covered in this dataset
                   </span>
                   <h1
                     className="text-[32px] md:text-[44px] font-semibold leading-[1.1] tracking-tight"
@@ -278,7 +316,7 @@ function ActiveStatePage({ code, name }: { code: StateCode; name: string }) {
                 ]} />
 
                 <SubHeading>Actions that require an open meeting with prior notice</SubHeading>
-                <P>The board cannot take action outside of a noticed meeting on these critical matters: fines and damage assessments, foreclosure initiation, enforcement actions, assessment increases and special assessments, architectural appeal decisions, suspending an owner's rights, borrowing or lending money, adopting or amending governing documents, approving budgets, buying or selling property, filling board vacancies, capital improvements, and electing officers.</P>
+                <P>The board cannot take action outside of a noticed meeting on these critical matters: fines and damage assessments, foreclosure initiation, enforcement actions, assessment increases and special assessments, architectural appeal decisions, suspending an owner&rsquo;s rights, borrowing or lending money, adopting or amending governing documents, approving budgets, buying or selling property, filling board vacancies, capital improvements, and electing officers.</P>
               </section>
 
               {/* ─── VOTING ─── */}
@@ -301,7 +339,7 @@ function ActiveStatePage({ code, name }: { code: StateCode; name: string }) {
               <section id="enforcement" className="scroll-mt-24">
                 <SectionHeading>Enforcement, fines, and hearings</SectionHeading>
                 <Ref>Sections 209.006 &ndash; 209.007</Ref>
-                <P>Before an HOA can suspend common area access, file suit, charge for property damage, levy a fine, or report to credit agencies, they must give written notice by certified mail including a description of the violation, the amount due, the owner's right to cure (if curable), the right to request a hearing within 30 days, and information about military servicemember protections.</P>
+                <P>Before an HOA can suspend common area access, file suit, charge for property damage, levy a fine, or report to credit agencies, they must give written notice by certified mail including a description of the violation, the amount due, the owner&rsquo;s right to cure (if curable), the right to request a hearing within 30 days, and information about military servicemember protections.</P>
 
                 <SubHeading>Curable vs uncurable violations</SubHeading>
                 <P>Curable violations (parking, maintenance, unapproved modifications, ongoing noise) must include a reasonable cure period. If the owner cures in time, no fine can be assessed. Uncurable violations (fireworks, one-time noise, property damage) can be fined without a cure period but still require notice and hearing rights.</P>
@@ -341,7 +379,7 @@ function ActiveStatePage({ code, name }: { code: StateCode; name: string }) {
               <section id="coa-management" className="scroll-mt-24">
                 <SectionHeading>COA association management</SectionHeading>
                 <Ref>Sections 82.101 &ndash; 82.110</Ref>
-                <P>The unit owners' association must be organized as a corporation. The board can adopt and amend bylaws, hire and fire managing agents, sue and be sued, regulate use and appearance, impose fines (with notice and hearing), and borrow money. Board members are fiduciaries of the unit owners.</P>
+                <P>The unit owners&rsquo; association must be organized as a corporation. The board can adopt and amend bylaws, hire and fire managing agents, sue and be sued, regulate use and appearance, impose fines (with notice and hearing), and borrow money. Board members are fiduciaries of the unit owners.</P>
 
                 <SubHeading>Declarant control period</SubHeading>
                 <P>The declaration may provide for a period where the developer appoints and removes board members. This terminates no later than 120 days after 75% of units are conveyed. At 50% conveyance, at least one-third of board members must be elected by non-declarant owners.</P>
@@ -456,15 +494,18 @@ function ActiveStatePage({ code, name }: { code: StateCode; name: string }) {
                     Search {name} HOAs
                   </h3>
                   <p className="text-[14px] mt-2 mb-4" style={{ color: "var(--color-ha-text-soft)" }}>
-                    We have over 3,400 HOA profiles in DFW with Health Scores, board member data, and transfer fee schedules. Search for free.
+                    This project holds profiles for more than 3,000 Dallas-Fort Worth HOAs, each with a projected score, board member data, and transfer fee schedules drawn from public filings. No account is needed.
                   </p>
-                  <a
+                  <p className="text-[12px] mb-4" style={{ color: "var(--color-ha-gray)" }}>
+                    This guide is a general summary for educational purposes and is not legal advice. Statutes change; read the linked chapters for the current text.
+                  </p>
+                  <Link
                     href="/"
                     className="inline-block text-[14px] font-semibold px-5 py-2.5 rounded-[10px] no-underline"
                     style={{ background: "var(--color-ha-primary)", color: "white" }}
                   >
                     {"Search HOAs \u2192"}
-                  </a>
+                  </Link>
                 </div>
               </section>
 

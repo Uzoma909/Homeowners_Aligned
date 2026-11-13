@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 
 const SECTIONS = [
-  { id: "states", label: "Search Your State" },
-  { id: "mission", label: "Our Mission" },
-  { id: "scoring", label: "How We Score" },
+  { id: "states", label: "State Guides" },
+  { id: "mission", label: "About This Project" },
+  { id: "scoring", label: "How Scores Work" },
   { id: "request", label: "Request Records" },
-  { id: "profile", label: "What You'll See" },
-  { id: "forum", label: "Community Forum" },
-  { id: "join", label: "Join Us" },
+  { id: "profile", label: "What a Profile Shows" },
+  { id: "dashboard", label: "Dashboard Concept" },
+  { id: "forum", label: "Forum Concept" },
+  { id: "join", label: "How It Was Built" },
 ] as const;
 
 export function AboutSidebar() {
